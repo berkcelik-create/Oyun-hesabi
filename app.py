@@ -10,6 +10,11 @@ if 'oyunlar' not in st.session_state:
 
 st.title("🎮 Oyun Hesap Yönetim Paneli")
 
+# --- LİNK BUTONU ---
+st.link_button("📚 Kütüphaneye Git", "https://paylasimlihesap.com/library/")
+
+st.divider() # Görsel ayırıcı
+
 col1, col2, col3 = st.columns([1, 1, 1])
 
 # --- 1. ARAMA PANELİ ---
@@ -32,19 +37,20 @@ with col2:
         yeni_oyun = st.text_input("Oyun Adı:")
         yeni_detay = st.text_area("Detay:")
         if st.button("Kaydet"):
-            st.session_state.oyunlar[yeni_oyun.lower()] = yeni_detay
-            st.rerun()
+            if yeni_oyun and yeni_detay:
+                st.session_state.oyunlar[yeni_oyun.lower()] = yeni_detay
+                st.rerun()
+            else:
+                st.error("Boş alan bırakma.")
 
 # --- 3. SİLME PANELİ ---
 with col3:
     st.subheader("🗑️ Kayıt Sil")
     with st.container(border=True):
-        # Silinecek oyunu seçmek için bir dropdown (açılır liste)
         silinecek_oyun = st.selectbox("Silinecek oyunu seçin:", list(st.session_state.oyunlar.keys()))
         if st.button("Seçili Oyunu Sil"):
             if silinecek_oyun in st.session_state.oyunlar:
                 del st.session_state.oyunlar[silinecek_oyun]
-                st.success(f"'{silinecek_oyun}' silindi!")
                 st.rerun()
 
 st.divider()
