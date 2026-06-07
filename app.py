@@ -1,30 +1,38 @@
 import streamlit as st
 
-# Session state ile veriyi hafızada tutalım (sayfa yenilenince gitmemesi için)
+# Sayfa ayarları
+st.set_page_config(layout="wide", page_title="Oyun Panelim")
+
 if 'oyunlar' not in st.session_state:
-    st.session_state.oyunlar = {
-        "valorant": "Valorant hesabı: Vandal skinleri mevcut.",
-        "pubg": "PUBG hesabı: M416 Glacier var."
-    }
+    st.session_state.oyunlar = {"valorant": "Vandal skinli hesap"}
 
-st.title("🎮 Oyun Hesap Arayüzü")
+st.title("🎮 Oyun Hesap Yönetim Paneli")
 
-# 1. Arama Bölümü
-st.subheader("🔍 Hesap Ara")
-arama = st.text_input("Oyun ismini girin:").lower()
-if arama:
-    sonuc = st.session_state.oyunlar.get(arama, "Bu oyun kayıtlı değil.")
-    st.write(f"**Sonuç:** {sonuc}")
+# 1. Sütunlara bölme (Panel yapısı için)
+col1, col2 = st.columns([1, 1])
 
-# 2. Veri Ekleme Bölümü (Görsel Arayüzden)
+with col1:
+    st.subheader("🔍 Hesap Arama")
+    with st.container(border=True): # Çerçeveli kutu içinde
+        arama = st.text_input("Oyun ismini yazın:").lower()
+        if arama:
+            sonuc = st.session_state.oyunlar.get(arama, "Kayıt bulunamadı.")
+            st.success(f"Sonuç: {sonuc}")
+
+with col2:
+    st.subheader("➕ Yeni Kayıt Ekle")
+    with st.container(border=True): # Çerçeveli kutu içinde
+        yeni_oyun = st.text_input("Oyun Adı:")
+        yeni_detay = st.text_area("Hesap Detayları:")
+        if st.button("Sisteme Kaydet"):
+            if yeni_oyun and yeni_detay:
+                st.session_state.oyunlar[yeni_oyun.lower()] = yeni_detay
+                st.success("Başarıyla eklendi!")
+            else:
+                st.warning("Boş alan bırakma.")
+
+# 2. Alt kısma bir liste paneli ekleyelim
 st.divider()
-st.subheader("➕ Yeni Oyun Ekle")
-yeni_oyun = st.text_input("Oyun Adı:").lower()
-yeni_detay = st.text_area("Hesap Detayları:")
-
-if st.button("Kaydet"):
-    if yeni_oyun and yeni_detay:
-        st.session_state.oyunlar[yeni_oyun] = yeni_detay
-        st.success(f"{yeni_oyun} başarıyla eklendi!")
-    else:
-        st.error("Lütfen tüm alanları doldurun.")
+st.subheader("📋 Mevcut Hesaplar")
+with st.expander("Kayıtlı oyun listesini gör"):
+    st.table(st.session_state.oyunlar)
